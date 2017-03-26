@@ -5,4 +5,4 @@ HW1 is an implementation of a puzzle solver which uses heuristic searchs to solv
 
 HW2 is an implementation of a constraint solver which solves graph coloring problems using recursive best first search and min-conflicts algorithms.
 
-HW3 is a NLP classifier for the Selected 20NewsGroup dataset which uses stemming and data preprocessing along with Naive Bayes, Random Forest, SVM, and logistic regression to classify the data.
+HW3 is an NLP classifier for the Selected 20NewsGroup dataset which uses stemming and data preprocessing along with Naive Bayes, Random Forest, SVM, and logistic regression to classify the data.
