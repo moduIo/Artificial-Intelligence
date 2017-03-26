@@ -62,8 +62,12 @@ def writeAssignment(solution):
 #---------------------------------------------------
 # DFSB implementation
 #---------------------------------------------------
-def dfsb():
+def dfsb(end):
 	global K, constraints, assignment, searches
+
+	# Timer for comparison
+	if time.time() >= end:
+		return 'failure'
 
 	if isComplete(assignment):
 		return assignment
@@ -75,7 +79,7 @@ def dfsb():
 		assignment[var] = color
 
 		if isConsistent(assignment, constraints):
-			result = dfsb()
+			result = dfsb(end)
 
 			if result != 'failure':
 				return result
@@ -300,7 +304,7 @@ generateCSP()
 start = time.clock() * 1000.0
 
 if int(sys.argv[3]) == 0:
-	solution = dfsb()
+	solution = dfsb(time.time() + 60)
 else:
 	solution = improved_dfsb()
 

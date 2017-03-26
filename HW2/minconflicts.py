@@ -11,7 +11,7 @@ import random
 # Implements Min Conflicts algorithm
 #---------------------------------------------------
 def minConflicts(maxSteps):
-	global N, M, K, assignment, constraints
+	global N, M, K, assignment, constraints, searches
 
 	# Generate a random initial assignment
 	greedyAssignment()
@@ -21,12 +21,10 @@ def minConflicts(maxSteps):
 		if isConsistent(assignment, constraints):
 			return True
 
-		#
-		#print(assignment)
-		#
-
 		var = pickConflictedVariable()
 		assignment[var] = minimizeConflicts(var)
+
+		searches += 1
 
 	return False
 
@@ -145,11 +143,11 @@ K = 0               # Size of domain
 searches = 0		# Number of search calls
 constraints = []    # List of constraints with the interpretation that the ith index is a list of constraints for the ith variable
 assignment = []     # Assignment of colors to variables
+failure = True      # Fail flag of algorithm
 
 generateCSP()
 
 start = time.clock() * 1000.0
-
 current = (time.clock() * 1000.0) - start
 
 # Random restart
@@ -157,17 +155,19 @@ while current < 60000:
 	if minConflicts(100000):
 		writeAssignment(assignment)
 		print(assignment)
+		failure = False
 		break
 
-	print('restart')
+	print('Restart')
 	# Random restart
 	assignment = [None] * N
 	current = (time.clock() * 1000.0) - start
 
-if not isConsistent(assignment, constraints):
+if failure:
 	writeAssignment('failure')
 	print('Failure')
 
 end = time.clock() * 1000.0
 
 print("Solution Time: " + str(end - start) + "ms")
+print("Searches: " + str(searches))
