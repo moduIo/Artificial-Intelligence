@@ -1,4 +1,4 @@
-# Artificial-Intelligence
+# Artificial Intelligence
 CSE 537 Artificial Intelligence - Fall 2016 - Stony Brook University
 
 HW1 is an implementation of a puzzle solver which uses heuristic search to solve instances of the 8 and 15 puzzle.
