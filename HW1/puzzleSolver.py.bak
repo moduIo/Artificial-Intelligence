@@ -1,0 +1,292 @@
+# Tim Zhang
+# 110746199
+# CSE537 HW 1
+#------------------------------------------------
+import sys
+
+#------------------------------------------------
+# Node class
+#------------------------------------------------
+class node:
+	def __init__(self, state, parent, action):
+		self.state = state
+		self.parent = parent
+		self.action = action
+
+		if parent != None:
+			self.pathCost = parent.pathCost + 1
+			self.depth = parent.depth + 1
+
+		else:
+			self.pathCost = 0
+			self.depth = 0
+
+	#
+	# Returns the state reached when the blank is moved left
+	#
+	def moveLeft(self, emptySpace):
+		state = list(self.state)
+		state[emptySpace], state[emptySpace - 1] = state[emptySpace - 1], state[emptySpace]
+
+		return state
+
+	#
+	# Returns the state reached when the blank is moved right
+	#
+	def moveRight(self, emptySpace):
+		state = list(self.state)
+		state[emptySpace], state[emptySpace + 1] = state[emptySpace + 1], state[emptySpace]
+
+		return state
+
+	#
+	# Returns the state reached when the blank is moved up
+	#
+	def moveUp(self, emptySpace):
+		state = list(self.state)
+		state[emptySpace], state[emptySpace - instance] = state[emptySpace - instance], state[emptySpace]
+
+		return state
+
+	#
+	# Returns the state reached when the blank is moved down
+	#
+	def moveDown(self, emptySpace):
+		state = list(self.state)
+		state[emptySpace], state[emptySpace + instance] = state[emptySpace + instance], state[emptySpace]
+
+		return state
+
+	#
+	# Calculates the successors of the state
+	#
+	def successor(self):
+		global instance
+		successors = [None] * 0
+		rightEdge = False
+		leftEdge = False
+		topEdge = False
+		bottomEdge = False
+
+		emptySpace = self.state.index(0)
+
+		# Calculate positional constraints
+		if (emptySpace + 1) % instance == 0:  # The space is on a right-most edge
+			rightEdge = True
+
+		elif (emptySpace + 1) % instance == 1:  # The space if on a left-most edge
+			leftEdge = True
+
+		if (emptySpace + 1) <= instance:  # The space is in the top row
+			topEdge = True
+
+		elif (emptySpace + 1) > (instance * instance) - instance:  # The space in on the bottom row
+			bottomEdge = True
+
+		# Calculate the successors
+		if not topEdge:
+			# Move Up action
+			successors.append(['U', self.moveUp(emptySpace)])
+
+		if not bottomEdge:
+			# Move Down action
+			successors.append(['D', self.moveDown(emptySpace)])
+
+		if not leftEdge:
+			# Move Left action
+			successors.append(['L', self.moveLeft(emptySpace)])
+
+		if not rightEdge:
+			# Move Right action
+			successors.append(['R', self.moveRight(emptySpace)])
+
+		######################################
+		#
+		# TESTING
+		#
+		######################################
+		print '\nPosition:'
+		print 'Right: ' + str(rightEdge)
+		print 'Left: ' + str(leftEdge)
+		print 'Top: ' + str(topEdge)
+		print 'Bottom: ' + str(bottomEdge)
+
+		print '\nSuccessors: '
+		for x in successors:
+			print str(x[0]) + str(x[1])
+
+	#
+	# Calculates the "Misplaced Tiles" heuristic
+	#
+	def misplacedTilesHeuristic(self):
+		global instance
+		misplacedTiles = 0
+
+		for n in range(1, instance * instance):
+			if self.state.index(n) + 1 != n:
+				misplacedTiles += 1
+
+		return misplacedTiles
+
+	#
+	# Calculates the "Manhattan Distance" heuristic
+	#
+	def manhattanDistanceHeuristic(self):
+		global instance
+		manhattanDistance = 0
+
+		for pos in range(1, instance * instance):
+			i = self.state.index(pos) + 1
+
+			while i != pos:
+
+				######################################
+				#
+				# TESTING
+				#
+				######################################
+				print "\npos = " + str(pos)
+				print "i = " + str(i)
+
+				if i < pos:
+					# Try moving the tile down
+					if i + instance <= pos:
+						i += instance
+						manhattanDistance += 1
+
+						######################################
+						#
+						# TESTING
+						#
+						######################################
+						print "DOWN 1"
+
+					# If the tile is within a right movable distance away
+					# AND it is not on a right edge
+					elif pos - i <= instance - (i % instance) and i % instance != 0:
+						move = pos - i
+						i += move
+						manhattanDistance += move
+
+						######################################
+						#
+						# TESTING
+						#
+						######################################
+						print "RIGHT " + str(move)
+
+					# Else move the tile down
+					else:
+						i += instance
+						manhattanDistance += 1
+
+						######################################
+						#
+						# TESTING
+						#
+						######################################
+						print "DOWN 1"
+
+				else:
+					# Try moving the tile up
+					if i - instance >= pos:
+						i -= instance
+						manhattanDistance += 1
+
+						######################################
+						#
+						# TESTING
+						#
+						######################################
+						print "UP 1"
+
+					# If the tile is within a left movable distance away
+					# OR it is a on a right edge and the movable distance is within n - 1 moves away
+					elif i - pos <= i % instance - 1 or (i % instance == 0 and i - pos <= instance - 1):
+						move = i - pos
+						i -= move
+						manhattanDistance += move
+
+						######################################
+						#
+						# TESTING
+						#
+						######################################
+						print "LEFT " + str(move)
+
+					# Else move the tile up
+					else:
+						i -= instance
+						manhattanDistance += 1
+
+						######################################
+						#
+						# TESTING
+						#
+						######################################
+						print "UP 1"
+
+		return manhattanDistance
+
+	#
+	# Checks if the node is a goal state by a simple matching
+	#
+	def goalTest(self):
+		if self.state == [1, 2, 3, 4, 5, 6, 7, 8, 0] and instance == 3:
+			return True
+
+		elif self.state == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0] and instance == 4:
+			return True
+
+#------------------------------------------------
+# Transforms input puzzle into a list
+# The "Blank" tile will be represented as a 0
+#------------------------------------------------
+def generatePuzzle(puzzle):
+	fin = open(sys.argv[3])
+	lines = fin.readlines()
+
+	for l in lines:
+		row = l.split(',')
+		
+		for n in row:
+			if n.rstrip() == '':
+				puzzle.append(0)
+			else: 
+				puzzle.append(int(n.rstrip()))
+
+#------------------------------------------------
+# Main
+#------------------------------------------------
+instance = int(sys.argv[2])		# Instance of the puzzle, (3x3) or (4x4)
+puzzle = [None] * 0				# Empty initial puzzle
+
+generatePuzzle(puzzle)
+
+initialState = node(puzzle, None, None)  # Initialize the start state with the input puzzle and no parent
+
+######################################
+#
+# TESTING
+#
+######################################
+s = ""
+for n in initialState.state:
+	s += str(n) + " "
+
+print "Initial State: " + s
+
+#initialState.successor()
+
+#print "Depth: " + str(initialState.depth)
+
+#print "g(n): " + str(initialState.pathCost)
+
+#if initialState.goalTest():
+#	print 'Goal: TRUE'
+#else:
+#	print 'Goal: FALSE'
+
+print 'Misplaced Tiles Heuristic: ' + str(initialState.misplacedTilesHeuristic())
+
+print 'Manhatten Distance Heuristic: ' + str(initialState.manhattanDistanceHeuristic())
